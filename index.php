@@ -5,29 +5,33 @@ function __autoload($className)
     include $className . '.php';
 }
 
-$info = new Integration(
-    '1560950580384DEMO',  //Terminal_Key банка
-    'f0ffckfde1wkh9a4',   //Secret_Key банка
-    "JJNsMgdJ2VdFGx4VgJehPYZxuNqgEiIz"  //Secret_Key Crm
+$order = new Integration(
+    $terminalKey,  //Terminal_Key банка
+    $secretKey,   //Secret_Key банка
+    $apiCrmKey.  //Secret_Key Crm
+    $apiCrmUrl
+//    '1560950580384DEMO',  //Terminal_Key банка
+//    'f0ffckfde1wkh9a4',   //Secret_Key банка
+//    "JJNsMgdJ2VdFGx4VgJehPYZxuNqgEiIz",  //Secret_Key Crm
+//"http://u5904sbar-mn1-justhost.retailcrm.ru/api/v5/"
+
 );
 
 // тестовое id заказа
 $orderId = 6237;
-$data = $info->getOrderData($orderId);
 
-// подключаюсь к банку
-$bankApi = $info->bankConnection();
+/* Собираю данные о заказе*/
+$data = $order->getOrderData($orderId);
 
+/* подключаюсь к банку */
+$bankApi = $order->bankConnection();
+
+/* Выполняю транзакции для получения ссылок */
 foreach ($data->items as $item) {
-
-    $params = $info->getParams($item->id);
-
+    $params = $order->getParams($item->id);
     $bankApi->init($params);
-
-    var_dump($bankApi->response);
-
     //ссылка, которую получили из банка
-    echo "<br>".$bankApi->paymentUrl."<br>";
+    echo $bankApi->paymentUrl." ";
 }
 
 
