@@ -2,6 +2,9 @@
 
 include_once("TinkoffMerchantAPI.php");
 
+/*
+* Class for integration CRM to Tinkoff bank
+* */
 class Integration
 {
     private $terminalKey;  //Terminal_Key банка
@@ -12,19 +15,21 @@ class Integration
     private $email, $phone, $amount;
     public $items;
 
-    public function __construct($terminalKey, $secretKey, $apiCrmKey)
+    public function __construct($terminalKey, $secretKey, $apiCrmKey, $apiCrmUrl)
     {
         $this->api_url = 'https://securepay.tinkoff.ru/v2/';
         $this->terminalKey = $terminalKey;
         $this->secretKey = $secretKey;
 
-        $this->apiCrmUrl = "http://u5904sbar-mn1-justhost.retailcrm.ru/api/v5/"; //url Crm
+        $this->apiCrmUrl = $apiCrmUrl; //url Crm
         $this->apiCrmKey = $apiCrmKey;
     }
 
 
     /*
     * Доступ к API Tinkoff
+    *
+    * @return string
     * */
     public function bankConnection()
     {
@@ -37,10 +42,17 @@ class Integration
 
     /*
     * Обязательные данные для оформления заказа и получения ссылки из банка
+     *
+     * @param $parameter
+     * @param $filter
+     * @param $paymentType
+     *
+     * @return
     * */
-    public function getOrderData($orderId)
+    public function getOrderData($parameter, $filter, $paymentType = null)
     {
-        $orderInfo = file_get_contents($this->apiCrmUrl . "orders?apiKey=" . $this->apiCrmKey . "&filter[ids][]=" . $orderId);
+        $orderInfo = file_get_contents($this->apiCrmUrl . "orders?apiKey=" . $this->apiCrmKey . "&" . $filter . "=" . $parameter);
+//        $orderInfo = file_get_contents($this->apiCrmUrl . "orders?apiKey=" . $this->apiCrmKey . "&filter[ids][]=" . $orderId);
         $orderInfo = json_decode($orderInfo);
         $orderInfo = $orderInfo->orders[0];
 
@@ -57,13 +69,13 @@ class Integration
      * Собирает параметры для передачи банку
      * paymentId - пеередает внешний id, который crm выдала для оплаты конкретного товара
      * */
-    public function getParams ($paymentId)
+    public function getParams($paymentId)
     {
 
-        $sum  = 0;
+        $sum = 0;
         foreach ($this->items as $key => $item) {
 
-            $amount = ($item->initialPrice - $item->discountTotal)*100;
+            $amount = ($item->initialPrice - $item->discountTotal) * 100;
             $sum += $amount;
 
             $items [$key] = [
@@ -96,8 +108,5 @@ class Integration
 
         return $params;
     }
-
-
-
 
 }

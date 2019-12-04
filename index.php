@@ -10,18 +10,29 @@ $order = new Integration(
     $secretKey,   //Secret_Key банка
     $apiCrmKey.  //Secret_Key Crm
     $apiCrmUrl
-//    '1560950580384DEMO',  //Terminal_Key банка
-//    'f0ffckfde1wkh9a4',   //Secret_Key банка
-//    "JJNsMgdJ2VdFGx4VgJehPYZxuNqgEiIz",  //Secret_Key Crm
-//"http://u5904sbar-mn1-justhost.retailcrm.ru/api/v5/"
-
 );
 
-// тестовое id заказа
+/* тестовое id заказа */
 $orderId = 6237;
 
-/* Собираю данные о заказе*/
-$data = $order->getOrderData($orderId);
+$paymentType = "tinkoff-test";
+
+if (isset($orderId)) {
+
+    $parameter = $orderId;
+    $filter = "filter[ids][]";
+
+} elseif (isset($paymentType)) {
+
+    $parameter = $paymentType;
+    $filter = "filter[paymentTypes][]";
+
+} else
+    exit;
+
+/* Собираю данные о заказе */
+$data = $order->getOrderData($parameter, $filter, $paymentType);
+
 
 /* подключаюсь к банку */
 $bankApi = $order->bankConnection();
@@ -31,9 +42,8 @@ foreach ($data->items as $item) {
     $params = $order->getParams($item->id);
     $bankApi->init($params);
     //ссылка, которую получили из банка
-    echo $bankApi->paymentUrl." ";
+    echo $bankApi->paymentUrl . " ";
 }
-
 
 ?>
 
