@@ -1,4 +1,4 @@
-# Интеграция банка в интернет-магазин.
+# Bank integration into the online store.
 
-При покупке товара в интернет-магазине и выборе определелнного способа оплаты, происходит запрос в банк.
-Банк возвращает ссылки для выставления счета на оплату каждого товара, находящегося в корзине. 
+When buying goods in an online store and choosing a certain payment method, a request is made to the bank. 
+The bank returns links for invoicing for payment for each product in the basket.
